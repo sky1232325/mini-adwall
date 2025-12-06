@@ -150,7 +150,7 @@ const AdModal: React.FC<AdModalProps> = ({
           {formConfig.map((config) => renderFormItem(config))}
         </Form>
       </Spin>
-      {/* 原静态表单（注释掉）
+      {/* 原静态表单方式
       <Form form={form} layout="vertical">
         <Form.Item
           label="广告标题"

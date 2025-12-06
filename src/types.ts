@@ -17,9 +17,5 @@ export interface FormFieldConfig {
   label: string;          // 标签名
   component: 'Input' | 'TextArea' | 'InputNumber' | 'Upload';
   props?: Record<string, any>;
-  rules?: Array<{
-    required?: boolean;
-    message?: string;
-    type?: string;
-  }>;
+  rules?: any[]; 
 }

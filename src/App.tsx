@@ -76,6 +76,8 @@ const App: React.FC = () => {
     Modal.confirm({
       title: '确认删除',
       content: `确定要删除广告 "${ad.title}" 吗？`,
+      okText: '确定',
+      cancelText: '取消',
       onOk: async () => {
         try {
           await deleteAd(ad.id);

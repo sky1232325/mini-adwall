@@ -1,7 +1,28 @@
+# dependencies
 node_modules/
+
+# builds
 dist/
 dist-ssr/
-*.local
+build/
+
+# environment
 .env
+.env.*.local
+
+# tooling cache
 .vite/
+
+# logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# editors/OS
+.DS_Store
+.idea/
+.vscode/
+
+# runtime uploads (do not commit binaries)
+server/uploads/

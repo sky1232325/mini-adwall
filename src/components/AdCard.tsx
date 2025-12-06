@@ -1,6 +1,11 @@
 import React from 'react';
-import { Card, Button, Space, Typography } from 'antd';
-import { EditOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Button, Space, Typography, Dropdown } from 'antd';
+import {
+  EditOutlined,
+  CopyOutlined,
+  DeleteOutlined,
+  DownOutlined,
+} from '@ant-design/icons';
 import type { Ad } from '../types';
 
 const { Text } = Typography;
@@ -20,57 +25,70 @@ const AdCard: React.FC<AdCardProps> = ({
   onDelete,
   onClick,
 }) => {
+  const actionItems = [
+    {
+      key: 'edit',
+      label: '编辑广告',
+      icon: <EditOutlined />,
+      onClick: () => onEdit(ad),
+    },
+    {
+      key: 'copy',
+      label: '复制广告',
+      icon: <CopyOutlined />,
+      onClick: () => onCopy(ad),
+    },
+    {
+      key: 'delete',
+      label: '删除广告',
+      icon: <DeleteOutlined />,
+      onClick: () => onDelete(ad),
+    },
+  ];
+
   return (
     <Card
-      style={{ cursor: 'pointer', height: '100%' }}
+      style={{ cursor: 'pointer', height: '100%', position: 'relative' }}
       onClick={() => onClick(ad)}
     >
+      <div
+        style={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Dropdown
+          trigger={['click']}
+          placement="bottomRight"
+          menu={{
+            items: actionItems,
+            onClick: ({ key, domEvent }) => {
+              domEvent.stopPropagation();
+              const action = actionItems.find((item) => item.key === key);
+              action?.onClick();
+            },
+          }}
+        >
+          <Button type="primary">
+            操作 <DownOutlined />
+          </Button>
+        </Dropdown>
+      </div>
       <Card.Meta
         title={ad.title}
         description={
           <div>
             <p>发布者:{ad.publisher}</p>
             <p>{ad.content}</p>
-            <Space>
-              <Text type="danger">热度: {ad.clicks}</Text>
-              <Text strong>出价: {ad.price}</Text>
-            </Space>
-            <Space
-              style={{ marginTop: '10px', width: '100%' }}
-              onClick={(e) => e.stopPropagation()}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: 24,
+              }}
             >
-              <Button
-                size="small"
-                icon={<EditOutlined />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(ad);
-                }}
-              >
-                编辑
-              </Button>
-              <Button
-                size="small"
-                icon={<CopyOutlined />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onCopy(ad);
-                }}
-              >
-                复制
-              </Button>
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(ad);
-                }}
-              >
-                删除
-              </Button>
-            </Space>
+              <Text type="danger">热度：{ad.clicks}</Text>
+              <Text strong>出价：{ad.price}</Text>
+            </div>
           </div>
         }
       />
