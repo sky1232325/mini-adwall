@@ -5,7 +5,6 @@ import AdCard from './components/AdCard';
 import AdModal from './components/AdModal';
 import VideoPlayerModal from './components/VideoPlayerModal';
 import type { Ad } from './types';
-import { sortAdsByScore } from './utils/ranking';
 import './App.css';
 import { fetchAds, createAd, updateAd, deleteAd, clickAd } from './services/api';
 
