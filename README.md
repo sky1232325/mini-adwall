@@ -1,136 +1,284 @@
-# Mini广告墙 开发文档
+# Mini 广告墙
 
-## 项目概述
-- 目标：极简广告墙，支持广告 CRUD、竞价排序、视频上传/播放、动态表单配置。
-- 技术栈：React 19 + TypeScript + Vite、Ant Design 6、Express、Multer、CORS、文件存储。
-- 状态：基础功能与三项进阶任务（视频、多视频上传、动态表单）均已完成。
+[![Live Demo](https://img.shields.io/badge/demo-online-brightgreen)](https://miniadwall.1232325.xyz/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)](https://nodejs.org/)
 
-## 功能清单
-- 广告：创建、编辑、复制、删除。
-- 竞价排序：`score = price + price * clicks * 0.42`，后端统一排序返回。
-- 点击计数：点击广告后 +1 并刷新列表。
-- 视频：多文件上传，随机播放一条，播放结束跳转落地页。
-- 动态表单：表单项由后端 `/api/form-config` 下发并渲染。
-- 本地化：操作按钮与弹窗均为中文。
+一个极简版的广告投放和管理平台，基于 React + TypeScript + Express 实现的全栈应用。
 
-## 目录结构
-```
-miniAdWall_rebuild/
-├─ src/
-│  ├─ components/AdCard.tsx         # 广告卡片、操作下拉
-│  ├─ components/AdModal.tsx        # 动态表单弹窗+上传
-│  ├─ components/VideoPlayerModal.tsx
-│  ├─ services/api.ts               # 前端 API 封装
-│  ├─ utils/ranking.ts              # 排序算法
-│  ├─ types.ts                      # Ad / FormFieldConfig 类型
-│  ├─ App.tsx, main.tsx, App.css
-├─ server/
-│  ├─ index.js                      # Express API + Multer
-│  └─ uploads/                      # 视频文件存储
-├─ package.json, tsconfig.*, vite.config.ts
-```
+**在线演示**: [https://miniadwall.1232325.xyz/](https://miniadwall.1232325.xyz/)
 
-## 快速开始
+## 📊 项目完成度
+
+- ✅ **基础任务**：纯前端版本 mini 广告墙 (100%)
+- ✅ **进阶任务 1**：前后端分离版本 (100%)
+- ✅ **进阶任务 2**：视频上传和播放功能 (100%)
+- ✅ **进阶任务 3**：动态表单渲染 (100%)
+
+## ✨ 核心功能
+
+### 广告管理
+- 📝 **创建广告** - 支持表单填写和多视频上传
+- ✏️ **编辑广告** - 在线修改广告信息
+- 📋 **复制广告** - 快速复制现有广告
+- 🗑️ **删除广告** - 删除不需要的广告及关联文件
+
+### 竞价排名系统
+- 🏆 **智能排序** - 基于出价和点击数的竞价算法
+- 📈 **实时更新** - 每次点击后自动重新排序
+- 💰 **竞价公式**: `score = price + (price × clicks × 0.42)`
+
+### 视频功能
+- 🎬 **多视频上传** - 每个广告支持上传多个视频
+- ▶️ **视频播放器** - HTML5 原生播放器
+- 🔄 **自动跳转** - 播放完成后自动跳转到落地页
+- 🎲 **随机播放** - 多视频时随机选择播放
+
+### 动态表单
+- ⚙️ **配置驱动** - 表单完全由后端配置决定
+- 🎨 **动态渲染** - 根据配置自动生成表单字段
+- ✅ **智能验证** - 支持多种验证规则（必填、长度、类型等）
+- 🔧 **灵活扩展** - 无需修改代码即可添加新字段
+
+## 🛠️ 技术栈
+
+### 前端
+- **框架**: React 19 + TypeScript 5.9
+- **UI 库**: Ant Design 6.0
+- **构建工具**: Vite 7.2
+- **状态管理**: React Hooks (useState, useEffect)
+- **HTTP 客户端**: Fetch API
+
+### 后端
+- **运行时**: Node.js 18+
+- **框架**: Express 5.2
+- **文件上传**: Multer 2.0
+- **跨域处理**: CORS 2.8
+- **数据存储**: JSON 文件 (可扩展为数据库)
+
+### 部署
+- **Web 服务器**: Nginx
+- **进程管理**: PM2
+- **HTTPS**: Let's Encrypt SSL
+- **服务器**: 宝塔面板
+
+## 🚀 快速开始
+
+### 环境要求
+- Node.js >= 16
+- npm >= 8
+
+### 本地开发
+
 ```bash
-# 安装依赖
+# 1. 克隆项目
+git clone https://github.com/sky1232325/mini-adwall.git
+cd mini-adwall
+
+# 2. 安装依赖
 npm install
+cd server && npm install && cd ..
 
-# 启动后端
+# 3. 启动后端 (终端1)
 cd server
-node index.js   # http://localhost:3001
+npm start
+# 后端运行在 http://localhost:3001
 
-# 启动前端（新终端）
-cd ..
-npm run dev     # http://localhost:5173
+# 4. 启动前端 (终端2)
+npm run dev
+# 前端运行在 http://localhost:5173
 ```
 
-## 环境变量
-- 当前前端 `API_BASE` 写死为 `http://localhost:3001/api`（见 `src/services/api.ts`）。
-- 部署时请改为环境变量（如 `VITE_API_BASE_URL`），并在 `api.ts` 中读取。
+访问 [http://localhost:5173](http://localhost:5173) 查看应用
 
-## 前端说明
-- UI：Ant Design 6；主要用 Modal、Upload、Form、Input、InputNumber、Dropdown。
-- 状态：React hooks 本地状态；数据全量来自后端 API。
-- 动态表单：`AdModal` 请求 `/api/form-config` 并按配置渲染；上传字段独立处理。
-- 视频播放：如有 `videoUrls` 则随机取一条播放，结束后跳转 `landingUrl`。
-- 排序：使用后端排序结果直接展示。
+### 生产部署
 
-## 后端说明（`server/index.js`）
-- 依赖：express, cors, body-parser, multer, fs, path。
-- 数据：`ads.json` 文件存储；视频落盘 `uploads/`，静态路径 `/uploads/<file>`。
-- 路由：
-  - `GET /api/form-config` 获取表单配置。
-  - `GET /api/ads` 获取列表（已按竞价分数排序）。
-  - `POST /api/ads` 创建广告（支持多视频）。
-  - `PUT /api/ads/:id` 更新广告（可追加视频）。
-  - `DELETE /api/ads/:id` 删除广告。
-  - `POST /api/ads/:id/click` 点击+1。
+详细的部署步骤请参考 [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)
 
-## 数据结构
-```ts
-// Ad
+```bash
+# 构建前端
+npm run build
+
+# 使用 PM2 启动后端
+cd server
+pm2 start index.js --name mini-adwall-server
+
+# 配置 Nginx 反向代理（参考部署文档）
+```
+
+## 📁 项目结构
+
+```
+mini-adwall/
+├── src/                          # 前端源代码
+│   ├── components/               # React 组件
+│   │   ├── AdCard.tsx           # 广告卡片组件
+│   │   ├── AdModal.tsx          # 动态表单弹窗
+│   │   └── VideoPlayerModal.tsx # 视频播放器
+│   ├── services/
+│   │   └── api.ts               # API 接口封装
+│   ├── utils/
+│   │   └── ranking.ts           # 竞价排名算法
+│   ├── types.ts                 # TypeScript 类型定义
+│   ├── App.tsx                  # 主应用组件
+│   └── main.tsx                 # 应用入口
+├── server/                       # 后端源代码
+│   ├── index.js                 # Express 服务器
+│   ├── ads.json                 # 广告数据存储
+│   ├── uploads/                 # 视频文件目录
+│   └── package.json             # 后端依赖
+├── public/                       # 静态资源
+├── dist/                         # 构建产物
+├── package.json                  # 前端依赖
+├── vite.config.ts               # Vite 配置
+├── tsconfig.json                # TypeScript 配置
+└── README.md                     # 项目文档
+```
+
+## 🎯 核心实现
+
+### 竞价排名算法
+
+```typescript
+// 计算广告竞价分数
+const calculateScore = (ad: Ad): number => {
+  return ad.price + (ad.price * ad.clicks * 0.42);
+};
+
+// 按分数降序排序
+const sortAdsByScore = (ads: Ad[]): Ad[] => {
+  return [...ads].sort((a, b) => calculateScore(b) - calculateScore(a));
+};
+```
+
+**示例**:
+- 广告 A: 出价 5 元, 点击 10 次 → score = 5 + (5 × 10 × 0.42) = **26**
+- 广告 B: 出价 10 元, 点击 2 次 → score = 10 + (10 × 2 × 0.42) = **18.4**
+- 结果: 广告 A 排名更靠前
+
+### 动态表单渲染
+
+后端配置示例:
+```json
 {
-  id: string;
-  title: string;
-  publisher: string;
-  content: string;
-  landingUrl: string;
-  price: number;
-  clicks: number;
-  videoUrls?: string[];
-  createdAt?: string;
-}
-
-// FormFieldConfig（后端下发）
-{
-  field: string;
-  label: string;
-  component: 'Input' | 'TextArea' | 'InputNumber' | 'Upload';
-  props?: Record<string, any>;
-  rules?: any[]; // 兼容后端返回的校验
+  "field": "title",
+  "label": "广告标题",
+  "component": "Input",
+  "rules": [
+    { "required": true, "message": "请输入广告标题" },
+    { "max": 50, "message": "最多50个字符" }
+  ]
 }
 ```
 
-## 关键流程
-- 动态表单：
-  1) 弹窗开启 → 请求 `/api/form-config`；
-  2) 按配置渲染表单；
-  3) 提交：非上传字段写入 FormData，上传文件逐个 append `videos`；
-  4) 调用创建/更新 API，成功后刷新列表。
-- 视频上传/播放：
-  1) Upload 选择文件，`beforeUpload={() => false}` 阻止自动传；
-  2) 提交时随 FormData 发送，Multer 落盘并返回可访问 URL；
-  3) 点击广告随机播放一条，播放结束跳转落地页。
+前端自动渲染:
+```typescript
+const renderFormField = (config: FormFieldConfig) => (
+  <Form.Item label={config.label} name={config.field} rules={config.rules}>
+    {config.component === 'Input' && <Input />}
+    {config.component === 'TextArea' && <Input.TextArea rows={4} />}
+    {config.component === 'InputNumber' && <InputNumber />}
+  </Form.Item>
+);
+```
 
-## 测试要点
-- CRUD：创建/编辑/复制/删除成功并刷新列表。
-- 排序：调价或点击后顺序随分数变化。
-- 点击：点击计数 +1 并实时展示。
-- 上传：多视频成功上传且可播放。
-- 动态表单：配置字段正确渲染，校验按配置生效。
-- 本地化：操作/弹窗按钮均为中文。
+## 📡 API 接口
 
-## 部署建议
-### 后端（Render / Railway）
-- 环境变量：可选 `PORT`（默认 3001）。
-- 持久化：`uploads/` 为本地存储，免费方案重启会丢失；如需持久化请挂载卷或换对象存储。
-- CORS：允许前端域名；示例 `origin` 添加 Vercel / GitHub Pages 域。
-- 部署产出：`https://<backend-domain>/api` 作为 API Base，`https://<backend-domain>/uploads/<file>` 提供视频。
+| 方法 | 端点 | 描述 |
+|------|------|------|
+| GET | `/api/form-config` | 获取表单配置 |
+| GET | `/api/ads` | 获取广告列表 |
+| POST | `/api/ads` | 创建广告 |
+| PUT | `/api/ads/:id` | 更新广告 |
+| DELETE | `/api/ads/:id` | 删除广告 |
+| POST | `/api/ads/:id/click` | 增加点击数 |
+| POST | `/api/upload` | 上传文件 |
+| GET | `/api/health` | 健康检查 |
 
-### 前端（Vercel / GitHub Pages）
-- 环境变量：在构建时设置 `VITE_API_BASE_URL=https://<backend-domain>/api`。
-- 构建：`npm run build`，产出 `dist/`。
-- 部署：
-  - Vercel：导入 repo，设置环境变量，选择 `npm run build` + `dist`。
-  - GitHub Pages：将 `dist` 推到 `gh-pages` 分支或用 Actions 自动部署。
+详细的 API 文档请参考源代码注释。
 
-### 验收与可访问链接
-- 后端示例：`https://your-backend.example.com/api`（请替换为实际 Render/Railway 域名）。
-- 前端示例：`https://your-frontend.example.com`（请替换为实际 Vercel/Pages 域名）。
-- 验收 checklist：CRUD、上传与播放、动态表单加载、跨域请求、`/uploads` 资源可访问。
+## 🎨 功能演示
 
-## 后续优化
-- 将 `rules` 收敛为 antd `Rule[]` 类型并做枚举映射。
-- 统一读取环境变量，去除 API 硬编码。
-- 增加上传大小/类型限制提示、错误边界和加载骨架。
-- 补充自动化测试与 CI/CD（GitHub Actions），可添加 VS Code tasks 便捷启动。
+### 1. 创建广告
+1. 点击右上角"新增广告"按钮
+2. 系统自动从后端加载表单配置
+3. 填写广告信息（标题、发布人、内容、落地页、出价）
+4. 可选：上传多个视频文件
+5. 点击"确定"提交
+
+### 2. 点击广告
+- **有视频**: 播放视频 → 自动跳转落地页
+- **无视频**: 直接跳转落地页
+- 同时点击数 +1，列表自动重新排序
+
+### 3. 编辑/复制/删除
+- **编辑**: 修改现有广告信息
+- **复制**: 快速创建相似广告
+- **删除**: 删除广告及其关联的视频文件
+
+## 📈 性能优化
+
+- ✅ 静态资源缓存（图片 30 天，JS/CSS 12 小时）
+- ✅ Gzip 压缩
+- ✅ HTTP/2 + QUIC 支持
+- ✅ CDN 友好的资源组织
+- ✅ 懒加载和代码分割建议
+
+## 🔒 安全特性
+
+- ✅ HTTPS 强制加载 (HSTS)
+- ✅ CORS 跨域保护
+- ✅ 文件上传大小限制（100MB）
+- ✅ 文件类型验证
+- ✅ SQL 注入防护（文件存储方案）
+- ✅ XSS 防护（React 自动转义）
+
+## 📝 开发日志
+
+- **2025-12-07**: 项目初始化，完成基础任务
+- **2025-12-07**: 完成进阶任务 1（前后端分离）
+- **2025-12-07**: 完成进阶任务 2（视频上传播放）
+- **2025-12-07**: 完成进阶任务 3（动态表单渲染）
+- **2025-12-07**: 部署上线到生产环境
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
+
+## 👨‍💻 作者
+
+**sky1232325**
+- GitHub: [@sky1232325](https://github.com/sky1232325)
+- Email: liuchun1232325@outlook.com
+
+## 🙏 致谢
+
+- [React](https://react.dev/) - 前端框架
+- [Ant Design](https://ant.design/) - UI 组件库
+- [Vite](https://vitejs.dev/) - 构建工具
+- [Express](https://expressjs.com/) - 后端框架
+- 字节跳动 - 项目灵感来源
+
+## 📚 相关文档
+
+- [项目开发文档](./DEVELOPMENT.md) - 详细的开发文档
+- [部署指南](./IMPLEMENTATION_GUIDE.md) - 宝塔面板部署教程
+- [API 文档](./server/index.js) - 后端接口说明
+
+---
+
+**在线演示**: [https://miniadwall.1232325.xyz/](https://miniadwall.1232325.xyz/)
+
+如有问题或建议，欢迎提 Issue！⭐ 如果觉得项目有帮助，请给个 Star 支持一下！
