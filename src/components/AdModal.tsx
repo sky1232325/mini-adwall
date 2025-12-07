@@ -6,12 +6,10 @@ import {
   InputNumber,
   Upload,
   Button,
-  Spin,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
-import type { Ad, FormFieldConfig } from '../types';
-import { fetchFormConfig } from '../services/api';
+import type { Ad } from '../types';
 
 interface AdModalProps {
   visible: boolean;
@@ -30,23 +28,9 @@ const AdModal: React.FC<AdModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [formConfig, setFormConfig] = useState<FormFieldConfig[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
-      // 动态加载表单配置
-      setLoading(true);
-      fetchFormConfig()
-        .then((config) => {
-          setFormConfig(config);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error('加载表单配置失败:', err);
-          setLoading(false);
-        });
-
       if (mode === 'create') {
         form.resetFields();
         setFileList([]);
@@ -61,22 +45,12 @@ const AdModal: React.FC<AdModalProps> = ({
     form.validateFields().then((values) => {
       const formData = new FormData();
 
-      // 动态添加表单字段
-      formConfig.forEach((config) => {
-        if (config.component !== 'Upload') {
-          const value = values[config.field];
-          if (value !== undefined && value !== null) {
-            formData.append(config.field, value.toString());
-          }
+      // 添加表单字段
+      Object.keys(values).forEach((key) => {
+        if (values[key] !== undefined && values[key] !== null) {
+          formData.append(key, values[key].toString());
         }
       });
-
-      // 原方式（注释掉）
-      // Object.keys(values).forEach((key) => {
-      //   if (values[key] !== undefined && values[key] !== null) {
-      //     formData.append(key, values[key].toString());
-      //   }
-      // });
 
       // 添加视频文件
       fileList.forEach((file) => {
@@ -91,51 +65,6 @@ const AdModal: React.FC<AdModalProps> = ({
     });
   };
 
-  const renderFormItem = (config: FormFieldConfig) => {
-    const { field, label, component, props = {}, rules = [] } = config;
-
-    let inputNode;
-    switch (component) {
-      case 'Input':
-        inputNode = <Input {...props} placeholder={`请输入${label}`} />;
-        break;
-      case 'TextArea':
-        inputNode = <Input.TextArea {...props} placeholder={`请输入${label}`} />;
-        break;
-      case 'InputNumber':
-        inputNode = <InputNumber {...props} style={{ width: '100%' }} />;
-        break;
-      case 'Upload':
-        inputNode = (
-          <Upload
-            beforeUpload={() => false}
-            fileList={fileList}
-            onChange={({ fileList }) => setFileList(fileList)}
-            {...props}
-          >
-            <Button icon={<UploadOutlined />}>选择文件</Button>
-          </Upload>
-        );
-        break;
-      default:
-        inputNode = <Input {...props} />;
-    }
-
-    if (component === 'Upload') {
-      return (
-        <Form.Item key={field} label={label}>
-          {inputNode}
-        </Form.Item>
-      );
-    }
-
-    return (
-      <Form.Item key={field} label={label} name={field} rules={rules}>
-        {inputNode}
-      </Form.Item>
-    );
-  };
-
   return (
     <Modal
       title={mode === 'create' ? '新增广告' : '编辑广告'}
@@ -145,12 +74,6 @@ const AdModal: React.FC<AdModalProps> = ({
       okText="确定"
       cancelText="取消"
     >
-      <Spin spinning={loading}>
-        <Form form={form} layout="vertical">
-          {formConfig.map((config) => renderFormItem(config))}
-        </Form>
-      </Spin>
-      {/* 原静态表单方式
       <Form form={form} layout="vertical">
         <Form.Item
           label="广告标题"
@@ -207,7 +130,6 @@ const AdModal: React.FC<AdModalProps> = ({
           </Upload>
         </Form.Item>
       </Form>
-      */}
     </Modal>
   );
 };

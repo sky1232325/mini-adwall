@@ -1,11 +1,5 @@
 # Mini 广告墙
 
-[![Live Demo](https://img.shields.io/badge/demo-online-brightgreen)](https://miniadwall.1232325.xyz/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js)](https://nodejs.org/)
-
 一个极简版的广告投放和管理平台，基于 React + TypeScript + Express 实现的全栈应用。
 
 **在线演示**: [https://miniadwall.1232325.xyz/](https://miniadwall.1232325.xyz/)
@@ -235,27 +229,6 @@ const renderFormField = (config: FormFieldConfig) => (
 - ✅ SQL 注入防护（文件存储方案）
 - ✅ XSS 防护（React 自动转义）
 
-## 📝 开发日志
-
-- **2025-12-07**: 项目初始化，完成基础任务
-- **2025-12-07**: 完成进阶任务 1（前后端分离）
-- **2025-12-07**: 完成进阶任务 2（视频上传播放）
-- **2025-12-07**: 完成进阶任务 3（动态表单渲染）
-- **2025-12-07**: 部署上线到生产环境
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
 
 ## 👨‍💻 作者
 
@@ -280,5 +253,3 @@ const renderFormField = (config: FormFieldConfig) => (
 ---
 
 **在线演示**: [https://miniadwall.1232325.xyz/](https://miniadwall.1232325.xyz/)
-
-如有问题或建议，欢迎提 Issue！⭐ 如果觉得项目有帮助，请给个 Star 支持一下！
