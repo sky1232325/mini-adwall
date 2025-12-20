@@ -6,7 +6,7 @@
     "content": "111",
     "landingUrl": "https://www.oceanengine.com/",
     "price": 111,
-    "clicks": 0,
+    "clicks": 1,
     "videoUrls": []
   },
   {
@@ -16,9 +16,9 @@
     "content": "11",
     "landingUrl": "https://juejin.cn/post/69768427820820725841",
     "price": 1,
-    "clicks": 4,
+    "clicks": 6,
     "videoUrls": [
-      "/uploads/video-1766216211046-578986143.mp4"
+      "/uploads/video-1766219858421-467146711.mp4"
     ]
   }
 ]
