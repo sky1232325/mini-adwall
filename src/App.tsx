@@ -5,6 +5,7 @@ import AdCard from './components/AdCard';
 import AdModal from './components/AdModal';
 import VideoPlayerModal from './components/VideoPlayerModal';
 import type { Ad } from './types';
+import { sortAdsByScore } from './utils/ranking';
 import './App.css';
 import { fetchAds, createAd, updateAd, deleteAd, clickAd } from './services/api';
 
@@ -31,7 +32,7 @@ const App: React.FC = () => {
   const loadAds = async () => {
     try {
       const data = await fetchAds();
-      setAds(data);
+      setAds(sortAdsByScore(data));
     } catch (error) {
       message.error('加载广告失败');
     }

@@ -10,12 +10,3 @@ export interface Ad {
   videoUrls?: string[];   // 视频URL列表
   createdAt?: string;     // 创建时间
 }
-
-// 表单字段配置(动态表单用)
-export interface FormFieldConfig {
-  field: string;          // 字段名
-  label: string;          // 标签名
-  component: 'Input' | 'TextArea' | 'InputNumber' | 'Upload';
-  props?: Record<string, any>;
-  rules?: any[]; 
-}
