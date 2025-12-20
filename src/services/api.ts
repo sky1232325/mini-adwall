@@ -1,9 +1,7 @@
 import type { Ad, FormFieldConfig } from '../types';
 
-// 生产环境使用相对路径，开发环境使用绝对路径
-const API_BASE_URL = import.meta.env.DEV 
-  ? 'http://localhost:3001/api'
-  : '/api';
+// 开发环境使用代理（vite 会转发到 localhost:3001），生产环境使用相对路径
+const API_BASE_URL = '/api';
 
 export const fetchFormConfig = async (): Promise<FormFieldConfig[]> => {
   const response = await fetch(`${API_BASE_URL}/form-config`);

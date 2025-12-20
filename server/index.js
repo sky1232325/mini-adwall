@@ -35,9 +35,10 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    // 获取文件扩展名
     const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname, ext);
-    cb(null, name + '-' + uniqueSuffix + ext);
+    // 使用 UUID 或 uniqueSuffix 作为文件名，避免中文文件名问题
+    cb(null, 'video-' + uniqueSuffix + ext);
   }
 });
 
@@ -98,13 +99,141 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   }
 });
 
-// 广告接口示例
+// 广告接口 - 读取 ads.json 文件
 app.get('/api/ads', (req, res) => {
-  res.json({
-    success: true,
-    data: [],
-    total: 0
-  });
+  try {
+    const adsPath = path.join(__dirname, 'ads.json');
+    const adsData = fs.readFileSync(adsPath, 'utf8');
+    const ads = JSON.parse(adsData);
+    res.json(ads);
+  } catch (error) {
+    console.error('Error reading ads:', error);
+    res.status(500).json({ error: 'Failed to read ads', details: error.message });
+  }
+});
+
+// 辅助函数：读写 ads.json
+const getAds = () => {
+  const adsPath = path.join(__dirname, 'ads.json');
+  const adsData = fs.readFileSync(adsPath, 'utf8');
+  return JSON.parse(adsData);
+};
+
+const saveAds = (ads) => {
+  const adsPath = path.join(__dirname, 'ads.json');
+  fs.writeFileSync(adsPath, JSON.stringify(ads, null, 2), 'utf8');
+};
+
+// 创建广告 - POST /api/ads
+app.post('/api/ads', upload.array('videoUrls', 10), (req, res) => {
+  try {
+    const ads = getAds();
+    const { title, publisher, content, landingUrl, price } = req.body;
+    
+    const videoUrls = [];
+    if (req.files && req.files.length > 0) {
+      req.files.forEach(file => {
+        videoUrls.push(`/uploads/${file.filename}`);
+      });
+    }
+
+    const newAd = {
+      id: Date.now().toString(),
+      title: title || '',
+      publisher: publisher || '',
+      content: content || '',
+      landingUrl: landingUrl || '',
+      price: parseFloat(price) || 0,
+      clicks: 0,
+      videoUrls: videoUrls
+    };
+
+    ads.push(newAd);
+    saveAds(ads);
+    res.json(newAd);
+  } catch (error) {
+    console.error('Create ad error:', error);
+    res.status(500).json({ error: 'Failed to create ad', details: error.message });
+  }
+});
+
+// 更新广告 - PUT /api/ads/:id
+app.put('/api/ads/:id', upload.array('videoUrls', 10), (req, res) => {
+  try {
+    const ads = getAds();
+    const { id } = req.params;
+    const { title, publisher, content, landingUrl, price } = req.body;
+    
+    const adIndex = ads.findIndex(a => a.id === id);
+    if (adIndex === -1) {
+      return res.status(404).json({ error: 'Ad not found' });
+    }
+
+    const videoUrls = [];
+    if (req.files && req.files.length > 0) {
+      req.files.forEach(file => {
+        videoUrls.push(`/uploads/${file.filename}`);
+      });
+    } else if (ads[adIndex].videoUrls) {
+      // 保留原有视频
+      videoUrls.push(...ads[adIndex].videoUrls);
+    }
+
+    ads[adIndex] = {
+      ...ads[adIndex],
+      title: title || ads[adIndex].title,
+      publisher: publisher || ads[adIndex].publisher,
+      content: content || ads[adIndex].content,
+      landingUrl: landingUrl || ads[adIndex].landingUrl,
+      price: parseFloat(price) || ads[adIndex].price,
+      videoUrls: videoUrls.length > 0 ? videoUrls : ads[adIndex].videoUrls
+    };
+
+    saveAds(ads);
+    res.json(ads[adIndex]);
+  } catch (error) {
+    console.error('Update ad error:', error);
+    res.status(500).json({ error: 'Failed to update ad', details: error.message });
+  }
+});
+
+// 删除广告 - DELETE /api/ads/:id
+app.delete('/api/ads/:id', (req, res) => {
+  try {
+    const ads = getAds();
+    const { id } = req.params;
+    
+    const filteredAds = ads.filter(a => a.id !== id);
+    if (filteredAds.length === ads.length) {
+      return res.status(404).json({ error: 'Ad not found' });
+    }
+
+    saveAds(filteredAds);
+    res.json({ success: true, message: 'Ad deleted successfully' });
+  } catch (error) {
+    console.error('Delete ad error:', error);
+    res.status(500).json({ error: 'Failed to delete ad', details: error.message });
+  }
+});
+
+// 点赞接口 - POST /api/ads/:id/click
+app.post('/api/ads/:id/click', (req, res) => {
+  try {
+    const ads = getAds();
+    const { id } = req.params;
+    
+    const adIndex = ads.findIndex(a => a.id === id);
+    if (adIndex === -1) {
+      return res.status(404).json({ error: 'Ad not found' });
+    }
+
+    ads[adIndex].clicks = (ads[adIndex].clicks || 0) + 1;
+    saveAds(ads);
+    res.json({ clicks: ads[adIndex].clicks });
+  } catch (error) {
+    console.error('Click ad error:', error);
+    res.status(500).json({ error: 'Failed to click ad', details: error.message });
+  }
 });
 
 // 404 处理

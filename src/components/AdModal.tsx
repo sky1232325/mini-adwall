@@ -55,7 +55,7 @@ const AdModal: React.FC<AdModalProps> = ({
       // 添加视频文件
       fileList.forEach((file) => {
         if (file.originFileObj) {
-          formData.append('videos', file.originFileObj);
+          formData.append('videoUrls', file.originFileObj);
         }
       });
 

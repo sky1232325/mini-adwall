@@ -19,6 +19,10 @@ const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
   useEffect(() => {
     if (visible && videoRef.current) {
       videoRef.current.play().catch((e) => console.error('自动播放失败:', e));
+    } else if (!visible && videoRef.current) {
+      // 关闭弹窗时暂停视频并重置播放位置
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
     }
   }, [visible]);
 
