@@ -30,19 +30,16 @@ const AdCard: React.FC<AdCardProps> = ({
       key: 'edit',
       label: '编辑广告',
       icon: <EditOutlined />,
-      onClick: () => onEdit(ad),
     },
     {
       key: 'copy',
       label: '复制广告',
       icon: <CopyOutlined />,
-      onClick: () => onCopy(ad),
     },
     {
       key: 'delete',
       label: '删除广告',
       icon: <DeleteOutlined />,
-      onClick: () => onDelete(ad),
     },
   ];
 
@@ -62,8 +59,9 @@ const AdCard: React.FC<AdCardProps> = ({
             items: actionItems,
             onClick: ({ key, domEvent }) => {
               domEvent.stopPropagation();
-              const action = actionItems.find((item) => item.key === key);
-              action?.onClick();
+              if (key === 'edit') onEdit(ad);
+              if (key === 'copy') onCopy(ad);
+              if (key === 'delete') onDelete(ad);
             },
           }}
         >

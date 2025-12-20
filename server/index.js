@@ -18,6 +18,63 @@ const HOST = process.env.HOST || '127.0.0.1';
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 
+// 表单配置（可扩展/替换为数据库读取）
+const formConfig = [
+  {
+    field: 'title',
+    label: '广告标题',
+    component: 'Input',
+    rules: [
+      { required: true, message: '请输入广告标题' },
+      { max: 50, message: '标题不超过50字符' }
+    ]
+  },
+  {
+    field: 'publisher',
+    label: '发布人',
+    component: 'Input',
+    rules: [
+      { required: true, message: '请输入发布人' },
+      { max: 30, message: '发布人不超过30字符' }
+    ]
+  },
+  {
+    field: 'content',
+    label: '内容文案',
+    component: 'TextArea',
+    props: { rows: 4 },
+    rules: [
+      { required: true, message: '请输入内容文案' },
+      { max: 200, message: '内容不超过200字符' }
+    ]
+  },
+  {
+    field: 'landingUrl',
+    label: '落地页',
+    component: 'Input',
+    rules: [
+      { required: true, message: '请输入落地页URL' },
+      { type: 'url', message: '请输入有效的URL' }
+    ]
+  },
+  {
+    field: 'price',
+    label: '出价',
+    component: 'InputNumber',
+    props: { min: 0, style: { width: '100%' } },
+    rules: [
+      { required: true, message: '请输入出价' }
+    ]
+  },
+  {
+    field: 'videoUrls',
+    label: '上传视频',
+    component: 'Upload',
+    props: { accept: 'video/*', multiple: true },
+    rules: []
+  }
+];
+
 console.log(`[${new Date().toISOString()}] Starting server...`);
 console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`Upload directory: ${UPLOAD_DIR}`);
@@ -67,6 +124,11 @@ app.use((req, res, next) => {
 });
 
 // ============ API 路由 ============
+
+// 动态表单配置
+app.get('/api/form-config', (req, res) => {
+  res.json(formConfig);
+});
 
 // 健康检查接口
 app.get('/api/health', (req, res) => {

@@ -6,10 +6,12 @@ import {
   InputNumber,
   Upload,
   Button,
+  Spin,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
-import type { Ad } from '../types';
+import type { Ad, FormFieldConfig } from '../types';
+import { fetchFormConfig } from '../services/api';
 
 interface AdModalProps {
   visible: boolean;
@@ -28,16 +30,24 @@ const AdModal: React.FC<AdModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [formConfig, setFormConfig] = useState<FormFieldConfig[]>([]);
+  const [configLoading, setConfigLoading] = useState(false);
 
   useEffect(() => {
-    if (visible) {
-      if (mode === 'create') {
-        form.resetFields();
-        setFileList([]);
-      } else if (initialValues) {
-        form.setFieldsValue(initialValues);
-        setFileList([]);
-      }
+    if (!visible) return;
+
+    setConfigLoading(true);
+    fetchFormConfig()
+      .then((config) => setFormConfig(config))
+      .catch(() => setFormConfig([]))
+      .finally(() => setConfigLoading(false));
+
+    if (mode === 'create') {
+      form.resetFields();
+      setFileList([]);
+    } else if (initialValues) {
+      form.setFieldsValue(initialValues);
+      setFileList([]);
     }
   }, [visible, mode, initialValues, form]);
 
@@ -47,6 +57,7 @@ const AdModal: React.FC<AdModalProps> = ({
 
       // 添加表单字段
       Object.keys(values).forEach((key) => {
+        if (key === 'videoUrls') return;
         if (values[key] !== undefined && values[key] !== null) {
           formData.append(key, values[key].toString());
         }
@@ -65,71 +76,81 @@ const AdModal: React.FC<AdModalProps> = ({
     });
   };
 
+  const renderField = (field: FormFieldConfig) => {
+    switch (field.component) {
+      case 'Input':
+        return (
+          <Form.Item
+            key={field.field}
+            label={field.label}
+            name={field.field}
+            rules={field.rules}
+          >
+            <Input {...field.props} placeholder={`请输入${field.label}`} />
+          </Form.Item>
+        );
+      case 'TextArea':
+        return (
+          <Form.Item
+            key={field.field}
+            label={field.label}
+            name={field.field}
+            rules={field.rules}
+          >
+            <Input.TextArea {...field.props} placeholder={`请输入${field.label}`} />
+          </Form.Item>
+        );
+      case 'InputNumber':
+        return (
+          <Form.Item
+            key={field.field}
+            label={field.label}
+            name={field.field}
+            rules={field.rules}
+          >
+            <InputNumber {...field.props} />
+          </Form.Item>
+        );
+      case 'Upload':
+        return (
+          <Form.Item
+            key={field.field}
+            label={field.label}
+            name={field.field}
+            rules={field.rules}
+            valuePropName="fileList"
+            getValueFromEvent={({ fileList: fl }) => fl}
+          >
+            <Upload
+              beforeUpload={() => false}
+              fileList={fileList}
+              onChange={({ fileList: fl }) => setFileList(fl)}
+              accept={field.props?.accept || 'video/*'}
+              multiple={field.props?.multiple}
+            >
+              <Button icon={<UploadOutlined />}>选择视频文件</Button>
+            </Upload>
+          </Form.Item>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Modal
-      title={mode === 'create' ? '新增广告' : '编辑广告'}
+      title={mode === 'create' || mode === 'copy' ? '新增广告' : '编辑广告'}
       open={visible}
       onOk={handleOk}
       onCancel={onCancel}
       okText="确定"
       cancelText="取消"
     >
-      <Form form={form} layout="vertical">
-        <Form.Item
-          label="广告标题"
-          name="title"
-          rules={[{ required: true, message: '请输入广告标题' }]}
-        >
-          <Input placeholder="请输入广告标题" />
-        </Form.Item>
-
-        <Form.Item
-          label="发布人"
-          name="publisher"
-          rules={[{ required: true, message: '请输入发布人' }]}
-        >
-          <Input placeholder="请输入发布人" />
-        </Form.Item>
-
-        <Form.Item
-          label="内容文案"
-          name="content"
-          rules={[{ required: true, message: '请输入内容文案' }]}
-        >
-          <Input.TextArea rows={4} placeholder="请输入内容文案" />
-        </Form.Item>
-
-        <Form.Item
-          label="落地页"
-          name="landingUrl"
-          rules={[
-            { required: true, message: '请输入落地页URL' },
-            { type: 'url', message: '请输入有效的URL' },
-          ]}
-        >
-          <Input placeholder="https://example.com" />
-        </Form.Item>
-
-        <Form.Item
-          label="出价"
-          name="price"
-          rules={[{ required: true, message: '请输入出价' }]}
-        >
-          <InputNumber min={0} style={{ width: '100%' }} />
-        </Form.Item>
-
-        <Form.Item label="上传视频">
-          <Upload
-            beforeUpload={() => false}
-            fileList={fileList}
-            onChange={({ fileList }) => setFileList(fileList)}
-            accept="video/*"
-            multiple
-          >
-            <Button icon={<UploadOutlined />}>选择视频文件</Button>
-          </Upload>
-        </Form.Item>
-      </Form>
+      <Spin spinning={configLoading} tip="加载表单配置...">
+        <Form form={form} layout="vertical">
+          {formConfig.map((field) => renderField(field))}
+        </Form>
+      </Spin>
     </Modal>
   );
 };

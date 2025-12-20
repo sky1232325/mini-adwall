@@ -131,6 +131,16 @@ mini-adwall/
 └── README.md                     # 项目文档
 ```
 
+## 后端接口（主要）
+- GET /api/form-config — 动态表单配置
+- GET /api/ads — 获取广告列表
+- POST /api/ads — 创建广告（支持多视频上传）
+- PUT /api/ads/:id — 更新广告
+- DELETE /api/ads/:id — 删除广告
+- POST /api/ads/:id/click — 点击数 +1
+- POST /api/upload — 通用文件上传（视频）
+- GET /api/health — 健康检查
+
 ## 🎯 核心实现
 
 ### 竞价排名算法

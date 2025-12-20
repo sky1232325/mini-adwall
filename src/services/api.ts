@@ -1,7 +1,12 @@
-import type { Ad } from '../types';
+import type { Ad, FormFieldConfig } from '../types';
 
 // 开发环境使用代理（vite 会转发到 localhost:3001），生产环境使用相对路径
 const API_BASE_URL = '/api';
+
+export const fetchFormConfig = async (): Promise<FormFieldConfig[]> => {
+  const response = await fetch(`${API_BASE_URL}/form-config`);
+  return response.json();
+};
 
 export const fetchAds = async (): Promise<Ad[]> => {
   const response = await fetch(`${API_BASE_URL}/ads`);
